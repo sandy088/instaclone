@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instaclone/providers/user_provider.dart';
+import 'package:instaclone/resources/firestore_methods.dart';
 import 'package:instaclone/utils/colors.dart';
 import 'package:instaclone/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -19,10 +20,31 @@ class AddPostScreen extends StatefulWidget {
 class _AddPostScreenState extends State<AddPostScreen> {
   Uint8List? _file;
   final TextEditingController _descriptionController = TextEditingController();
+  bool isLoading = false;
 
-  void postImage(String uid, String username, String profImage){
-    
+  void postImage(String uid, String username, String profImage) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      String res = await firestoreMethods().uploadPost(
+          _descriptionController.text, _file!, uid, username, profImage);
+
+      setState(() {
+        isLoading = false;
+      });
+      if (res == 'success') {
+        showSnackBar("posted Successfuly✅", context);
+        clearImage();
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showSnackBar(e.toString(), context);
+    }
   }
+
   _selectImage(BuildContext context) async {
     return showDialog(
         context: context,
@@ -66,6 +88,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
         });
   }
 
+  void clearImage() {
+    setState(() {
+      _file = null;
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -89,13 +117,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
               backgroundColor: mobileBackgroundColor,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back),
-                onPressed: () {},
+                onPressed: () {
+                  clearImage();
+                },
               ),
               title: const Text("Add Post"),
               centerTitle: true,
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () =>
+                      postImage(user.uid, user.userName, user.photoUrl),
                   icon: Icon(
                     Icons.upload,
                     color: Colors.blueAccent,
@@ -105,6 +136,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
             ),
             body: Column(
               children: [
+                isLoading
+                    ? const LinearProgressIndicator()
+                    : const Padding(padding: EdgeInsets.only(top: 0)),
+                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
