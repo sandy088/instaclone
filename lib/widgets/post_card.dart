@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:instaclone/utils/colors.dart';
+import 'package:intl/intl.dart';
+
+class PostCard extends StatelessWidget {
+  final snap;
+  const PostCard({super.key, this.snap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: mobileBackgroundColor,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 4,
+              horizontal: 16,
+            ).copyWith(right: 0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundImage: NetworkImage(
+                    snap['profImage'],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snap['username'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return SimpleDialog(
+                            title: const Text("More options"),
+                            children: [
+                              SimpleDialogOption(
+                                  padding: const EdgeInsets.all(18),
+                                  child: const Text("Delete Post"),
+                                  onPressed: () {}),
+                            ],
+                          );
+                        });
+                  },
+                  icon: const Icon(Icons.more_vert),
+                ),
+              ],
+            ),
+          ),
+
+          //Image Section
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.35,
+            width: double.infinity,
+            child: Image.network(
+              snap['postUrl'],
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          //Footer Section
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.comment_outlined,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.send_sharp,
+                ),
+              ),
+              Expanded(
+                  child: Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(
+                    onPressed: () {}, icon: Icon(Icons.bookmark_border)),
+              ))
+            ],
+          ),
+
+          //DEcsription and Number of comments stuff
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DefaultTextStyle(
+                  style: Theme.of(context)
+                      .textTheme
+                      .subtitle2!
+                      .copyWith(fontWeight: FontWeight.w800),
+                  child: Text(
+                    "${snap['likes'].length} likes",
+                    style: Theme.of(context).textTheme.bodyText2,
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(top: 8),
+                  child: RichText(
+                    text: TextSpan(
+                        style: const TextStyle(color: primaryColor),
+                        children: [
+                          TextSpan(
+                            text: snap['username'],
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(
+                            text: " ${snap['description']}",
+                          ),
+                        ]),
+                  ),
+                ),
+
+                //Lets Code for comments here!
+                InkWell(
+                  onTap: () {},
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      "See all 512 Comments",
+                      style:
+                          const TextStyle(fontSize: 16, color: secondaryColor),
+                    ),
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    DateFormat.yMMMd().format(
+                      snap['datePublished'].toDate(),
+                    ),
+                    style: const TextStyle(fontSize: 16, color: secondaryColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
